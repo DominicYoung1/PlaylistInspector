@@ -19,7 +19,7 @@ import request from 'request';
  var client_secret = process.env.CLIENT_SECRET; // Your secret
  var redirect_uri = process.env.REDIRECT_URI; // Your redirect uri
  
- console.log("ID of ", client_id)
+//  console.log("ID of ", process.env)
  
  /**
   * Generates a random string containing numbers and letters
@@ -40,7 +40,7 @@ import request from 'request';
  
  var app = express();
  
- app.use(express.static('public'))
+ app.use(express.static(`${process.env.PWD}/public`))
     .use(cors())
     .use(cookieParser());
  
