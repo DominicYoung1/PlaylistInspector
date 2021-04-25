@@ -9,13 +9,18 @@
 
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
+// import * as cors from 'cors';
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-var client_id = 'CLIENT_ID'; // Your client id
-var client_secret = 'CLIENT_SECRET'; // Your secret
-var redirect_uri = 'REDIRECT_URI'; // Your redirect uri
+require('dotenv').config();
+
+var client_id = process.env.CLIENT_ID; // Your client id
+var client_secret = process.env.CLIENT_SECRET; // Your secret
+var redirect_uri = process.env.REDIRECT_URI; // Your redirect uri
+
+console.log("ID of ", client_id)
 
 /**
  * Generates a random string containing numbers and letters
