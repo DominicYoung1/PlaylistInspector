@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Select Playlist</title>
+
+</head>
+
+<body>
+    <div>
+    <h1>Please select a playlist to clean up</h1>
+    <h2>{{Example}}</h2>
+    <div>
+        <form action="/clean-playlist" method="POST">
+            <label for="playlist">Choose a Playlist:</label>
+            <select name="playlist" id="playlist">
+                {{#playlists}}
+                <option value="{{id}}">{{name}}</option>
+                {{/playlists}}
+            </select>
+            <input id="auth" type="hidden" name="auth" value={{access_token}}>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    </div>
+</body>
+</html>

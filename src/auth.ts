@@ -12,7 +12,9 @@ import cors from 'cors';
 import * as querystring from 'querystring';
 import cookieParser from 'cookie-parser';
 import request from 'request';
-
+import {generatePlaylists} from './inspect-playlists';
+import mustache from 'mustache-express';
+import { playlistCleanup } from './playlist-cleanup';
  
  
  var client_id = process.env.CLIENT_ID; // Your client id
@@ -39,10 +41,14 @@ import request from 'request';
  var stateKey = 'spotify_auth_state';
  
  var app = express();
+ app.engine('html', mustache());
+ app.set('view engine', 'html');
+ app.set('views', __dirname + '/../templates');
  
- app.use(express.static(`${process.env.PWD}/public`))
+ app.use(express.static(__dirname + '/../public'))
     .use(cors())
-    .use(cookieParser());
+    .use(cookieParser())
+    .use(express.urlencoded({extended: true}));
  
  app.get('/login', (req: any, res: any) => {
  
@@ -50,7 +56,7 @@ import request from 'request';
    res.cookie(stateKey, state);
  
    // your application requests authorization
-   var scope = 'user-read-private user-read-email';
+   var scope = 'user-read-private user-read-email playlist-modify-public';
    res.redirect('https://accounts.spotify.com/authorize?' +
      querystring.stringify({
        response_type: 'code',
@@ -95,24 +101,11 @@ import request from 'request';
  
          var access_token = body.access_token,
              refresh_token = body.refresh_token;
- 
-         var options = {
-           url: 'https://api.spotify.com/v1/me',
-           headers: { 'Authorization': 'Bearer ' + access_token },
-           json: true
-         };
- 
-         // use the access token to access the Spotify Web API
-         request.get(options, (error: any, response: any, body: any) => {
-           console.log(body);
-         });
- 
+             const myPlaylists = generatePlaylists(access_token, refresh_token);
+             myPlaylists.then(playlists=> {
+              res.render('select-playlist', {Example: 'Highway to the danger zone', playlists: playlists, access_token: access_token});
+             });
          // we can also pass the token to the browser to make requests from there
-         res.redirect('/#' +
-           querystring.stringify({
-             access_token: access_token,
-             refresh_token: refresh_token
-           }));
        } else {
          res.redirect('/#' +
            querystring.stringify({
@@ -122,6 +115,13 @@ import request from 'request';
      });
    }
  });
+ app.post('/clean-playlist', (req: any, res: any)  => {
+  const auth = req.body.auth;
+  const playlist = req.body.playlist;
+  console.log(auth, playlist);
+  let cells = playlist.split(' ');
+  playlistCleanup(auth, cells[0], cells[1]);
+ })
  
  
  console.log('Listening on 8888');
