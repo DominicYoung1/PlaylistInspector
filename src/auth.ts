@@ -120,8 +120,11 @@ import { playlistCleanup } from './playlist-cleanup';
   const playlist = req.body.playlist;
   console.log(auth, playlist);
   let cells = playlist.split(' ');
-  playlistCleanup(auth, cells[0], cells[1]);
- })
+  let garbageList = playlistCleanup(auth, cells[0], cells[1]);
+  garbageList.then(removedTracks => {
+    res.render('cleaned-playlist', {tracks: removedTracks});
+  });
+ });
  
  
  console.log('Listening on 8888');

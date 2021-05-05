@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>Cleaning Report</title>
+
+</head>
+
+<body>
+    <div>
+    <h1>Your playlist has been cleaned!</h1>
+    <p>The following tracks were removed!</p>
+    <div>
+        <table style="width:100%">
+            <tr>
+              <th>Song Name/Artist</th>
+              <th>Track Number</th>
+            </tr>
+           {{#tracks}} <tr>
+              <td>{{tName}}</td>
+              <td>{{ind}}</td>
+            </tr> {{/tracks}}
+          </table> 
+    </div>
+    </div>
+</body>
+</html>

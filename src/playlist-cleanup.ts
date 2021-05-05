@@ -3,7 +3,7 @@ import { tokenToString } from 'typescript';
 
 
 
-export const playlistCleanup = (aToken: string, playlistId: string, snapshotId: string): void => {
+export const playlistCleanup = (aToken: string, playlistId: string, snapshotId: string): Promise<{ind: number, tName: string}[]> => {
     const spotifyApi = new SpotifyWebApi({
         clientId: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
@@ -11,7 +11,7 @@ export const playlistCleanup = (aToken: string, playlistId: string, snapshotId: 
     });
     spotifyApi.setAccessToken(aToken);
     let request1 = spotifyApi.getPlaylistTracks(playlistId);
-    request1.then(trackList => {
+   return request1.then(trackList => {
         if (trackList.statusCode !== 200) {
             console.log("Naw that ain't it cheif");
         }
@@ -20,13 +20,21 @@ export const playlistCleanup = (aToken: string, playlistId: string, snapshotId: 
         });
         let ghostArray: string[] = [];
         let indHolder: number[] = [];
+        let retArray: {ind: number, tName: string}[] = [];
         for (let i = 0; i < tracksInfo.length; i++) {
             if (!ghostArray.includes(tracksInfo[i])) {
                 ghostArray.push(tracksInfo[i]);
-            } else indHolder.push(i);
+            } else {
+                indHolder.push(i);
+                retArray.push({ind: i, tName: tracksInfo[i]});
+            }
         }
-        spotifyApi.removeTracksFromPlaylistByPosition(playlistId, indHolder, snapshotId);
+        if (indHolder.length > 0) {
+            spotifyApi.removeTracksFromPlaylistByPosition(playlistId, indHolder, snapshotId);
         console.log(tracksInfo);
         console.log(indHolder);
+        return retArray;
+        }
+        else return [];
     });
 }
